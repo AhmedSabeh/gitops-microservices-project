@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: sabeh-app
-          image: ahmedsabeh/sabeh-app:latest  # use your Docker Hub image
+          image: ahmedsabeh/sabeh-app:1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 80
