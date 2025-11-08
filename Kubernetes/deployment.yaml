@@ -13,10 +13,22 @@ spec:
       labels:
         app: sabeh-app
     spec:
+      automountServiceAccountToken: false
+
       containers:
         - name: sabeh-app
+<<<<<<< Updated upstream
           image: ahmedsabeh/sabeh-app:1.1
+=======
+          image: ahmedsabeh/sabeh-app:latest  # your Docker Hub image
+>>>>>>> Stashed changes
           imagePullPolicy: Always
           ports:
             - containerPort: 80
-
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
