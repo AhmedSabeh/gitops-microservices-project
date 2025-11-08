@@ -17,42 +17,37 @@
       color: #f9f9f9; /* Softer off-white for readability */
       text-align: center;
     }
-
     h1 {
       font-size: 3rem;
       margin-bottom: 20px;
       animation: fadeIn 2s ease-in-out;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* adds clarity */
     }
-
     p {
       font-size: 1.5rem;
       animation: fadeIn 3s ease-in-out;
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     .button {
       display: inline-block;
       margin-top: 30px;
       padding: 15px 30px;
       font-size: 1rem;
       font-weight: bold;
-      color: #ffffff;
-      background-color: #ff3d00;
+      color: #ffffff; /* white text */
+      background-color: #d32f2f; /* darker red for better contrast */
       border: none;
       border-radius: 30px;
       cursor: pointer;
       transition: all 0.3s ease;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-
     .button:hover {
-      background-color: #e53935;
+      background-color: #b71c1c; /* darker hover for accessibility */
       transform: scale(1.1);
     }
   </style>
