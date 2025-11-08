@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ahmed Sabeh Application</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #f6d365, #fda085);
+      color: #fff;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    p {
+      font-size: 1.5rem;
+      animation: fadeIn 3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    .button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 15px 30px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #f6d365;
+      background-color: #fff;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #f6d365;
+      color: #fff;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Hello! This is Ahmed Sabeh's Application</h1>
+    <p>Welcome to my small static website. 🎉</p>
+    <button class="button" onclick="alert('Hello! Thanks for visiting.')">Click</button>
+  </div>
+</body>
+</html>
+

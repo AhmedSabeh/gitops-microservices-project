@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sabeh
+  namespace: sabeh-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sabeh-app
+  template:
+    metadata:
+      labels:
+        app: sabeh-app
+    spec:
+      containers:
+        - name: sabeh-app
+          image: ahmedsabeh/sabeh-app:latest  # use your Docker Hub image
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+

@@ -1,0 +1,9 @@
+# === TERRAFORM ===
+
+# Local Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Local .terraform directory (contains provider plugins, modules, etc.)
+.terraform/
+.terraform.lock.hcl
