@@ -12,8 +12,9 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: linear-gradient(135deg, #f6d365, #fda085);
-      color: #fff;
+      /* 🌈 Better contrast: darker gradient */
+      background: linear-gradient(135deg, #ff9966, #ff5e62);
+      color: #ffffff;
       text-align: center;
     }
 
@@ -29,8 +30,8 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px);}
-      to { opacity: 1; transform: translateY(0);}
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .button {
@@ -39,7 +40,7 @@
       padding: 15px 30px;
       font-size: 1rem;
       font-weight: bold;
-      color: #f6d365;
+      color: #ff5e62;
       background-color: #fff;
       border: none;
       border-radius: 30px;
@@ -48,7 +49,7 @@
     }
 
     .button:hover {
-      background-color: #f6d365;
+      background-color: #ff5e62;
       color: #fff;
       transform: scale(1.1);
     }
