@@ -1,4 +1,4 @@
-# 🚀 DevOps AWS Cloud Infrastructure — GitOps Microservices Project
+# 🚀 DevOps AWS Cloud Infrastructure - GitOps Microservices Project
 
 ## 🧩 Overview
 This project provides a **complete CI/CD-ready cloud infrastructure** on AWS using Terraform, GitHub Actions, EKS, ArgoCD, CloudWatch, and DynamoDB.  
