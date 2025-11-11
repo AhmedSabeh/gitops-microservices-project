@@ -1,118 +1,102 @@
-# 🚀 GitOps CI/CD Project on AWS with EKS, Terraform, GitHub Actions, ArgoCD & DynamoDB
+# 🚀 DevOps AWS Cloud Infrastructure — GitOps Microservices Project
 
-This project demonstrates a **complete DevOps pipeline** that automates Infrastructure provisioning, Continuous Integration, Continuous Deployment, containerization, monitoring, and alerting using **AWS native services** and modern DevOps tools.
+## 🧩 Overview
 
-It follows the **GitOps** methodology — where Kubernetes manifests are managed declaratively through Git and automatically deployed by **ArgoCD**.
-
----
-
-## 🏗️ **Architecture Overview**
-
-<img width="2749" height="2144" alt="a new one" src="https://github.com/user-attachments/assets/3da1e810-b3bd-4f4b-bc8a-dafe3f2da942" />
+This project builds a **complete CI/CD-ready cloud infrastructure on AWS** using **Terraform**, **Ansible**, **Jenkins**, **EKS**, **ArgoCD**, **CloudWatch**, and **DynamoDB**.  
+It follows **infrastructure-as-code**, **GitOps**, and **modular Terraform** best practices for scalability and maintainability.
 
 ---
 
-## 🔹 **Key Components**
+## 🏗️ Architecture Components
+
+<img width="2749" height="2145" alt="a new one" src="https://github.com/user-attachments/assets/be0a9bd3-8f05-4ac2-94c8-63386bbc6ffb" />
 
 | Component | Description |
-|------------|--------------|
-| **Terraform** | Used for Infrastructure as Code (IaC) to build AWS resources such as VPC, subnets, Internet Gateway, NAT Gateways, EKS Cluster, and DynamoDB table. |
-| **EKS (Elastic Kubernetes Service)** | Hosts containerized microservices and provides orchestration, auto-scaling, and self-healing. |
-| **GitHub & GitHub Actions** | Stores application code and runs the CI pipeline to build, scan, and publish Docker images automatically. |
-| **Docker** | Containerizes the application for consistent runtime environments. |
-| **Trivy** | Performs security scanning on Docker images before pushing them to Docker Hub. |
-| **Docker Hub** | Central container registry where built Docker images are stored. |
-| **ArgoCD** | GitOps tool deployed inside EKS to continuously deploy new manifests from GitHub into the cluster. |
-| **DynamoDB** | AWS managed NoSQL database used by the application backend to store and retrieve data. |
-| **CloudWatch** | Monitors application and infrastructure metrics and sends alerts. |
-| **SNS + Gmail** | CloudWatch triggers an SNS topic that sends email alerts to the DevOps Engineer when any issue occurs. |
+|------------|-------------|
+| **VPC** | Custom VPC with public and private subnets across 3 Availability Zones. |
+| **EC2 Instances** | Two EC2 instances (Jenkins Master & Jenkins Worker) used for CI/CD, Docker builds, and integrations with Nexus & SonarQube. |
+| **EKS Cluster** | Managed Kubernetes cluster hosting microservices (frontend, backend). |
+| **Ansible** | Used for provisioning EC2 instances and installing Java, Jenkins, Git, Trivy, SonarQube, and Nexus. |
+| **DynamoDB** | Serverless NoSQL database used by the backend microservice for storing application data. |
+| **VPC Endpoint (Gateway)** | Allows private, secure communication between EKS Worker Nodes and DynamoDB without internet access. |
+| **CloudWatch** | Monitors EC2 instances, EKS cluster, and custom metrics. |
+| **SNS → Gmail Alerts** | CloudWatch alarms trigger SNS notifications that send alerts directly to the DevOps Engineer’s Gmail inbox. |
+| **ArgoCD** | Continuous Delivery tool that deploys the latest application version to EKS using GitOps. |
 
 ---
 
-## ⚙️ **Pipeline Workflow**
+---
 
-### 🧑‍💻 1. Developer Phase
-- Developer commits and pushes code to the **GitHub repository**.
-- This triggers a **GitHub Actions workflow**.
+## ⚙️ Tools & Technologies
 
-### 🏗️ 2. CI (Continuous Integration) with GitHub Actions
-1. **Checkout Code** — The pipeline pulls the latest code from GitHub.
-2. **Build Docker Image** — Using the `Dockerfile`, the app is containerized.
-3. **Trivy Security Scan** — Docker image is scanned for vulnerabilities.
-4. **Push Image to Docker Hub** — Secure, scanned image is pushed to a private/public registry.
-5. **Update Kubernetes Manifests** — The new image tag is updated in `deployment.yaml` and committed back to GitHub.
-
-### 🚀 3. CD (Continuous Deployment) with ArgoCD
-1. **ArgoCD** (running inside EKS) continuously monitors the GitHub repo for manifest changes.
-2. When a change is detected, ArgoCD automatically syncs and applies manifests to the **EKS cluster**.
-3. **Kubernetes** schedules the pods on worker nodes inside private subnets.
-4. **Load Balancer** in public subnet routes user traffic to the application.
-
-### 🧩 4. Application & DynamoDB Connection
-- The backend application (running on EKS pods) uses AWS SDK credentials (via IAM Role) to securely connect to **DynamoDB**.
-- **DynamoDB** stores and retrieves application data (e.g., user sessions, transactions, logs, or key-value pairs).
-- Access is secured through **IAM Roles for Service Accounts (IRSA)** configured via Terraform.
-
-### 📊 5. Monitoring & Alerting
-1. **CloudWatch** collects EKS, application, and DynamoDB metrics and logs.
-2. If a threshold is breached (e.g., CPU > 80%, DynamoDB latency, or application error), CloudWatch triggers an **alarm**.
-3. The alarm publishes a message to an **SNS topic**.
-4. **SNS** sends an **email notification** to the **DevOps Engineer (via Gmail)** for immediate awareness.
+- **AWS**: EC2, EKS, DynamoDB, CloudWatch, SNS, IAM, VPC
+- **Terraform**: Infrastructure as Code (modular structure)
+- **Ansible**: Server configuration management
+- **Docker**: Containerization
+- **Jenkins**: CI/CD automation
+- **ArgoCD**: Continuous Delivery (GitOps)
+- **CloudWatch + SNS**: Monitoring and alerting
+- **GitHub**: Source control and pipeline triggers
 
 ---
 
-## 🧰 **Tools & Technologies**
+## 🧱 Directory Structure
 
-| Category | Tools |
-|-----------|--------|
-| **Infrastructure** | Terraform, AWS |
-| **Containerization** | Docker |
-| **Orchestration** | Kubernetes (EKS) |
-| **CI/CD** | GitHub Actions, ArgoCD |
-| **Security** | Trivy |
-| **Database** | AWS DynamoDB |
-| **Monitoring & Alerts** | CloudWatch, SNS, Gmail |
-| **Networking** | VPC, Subnets, NAT, IGW, Load Balancer |
 
 ---
 
-## 🌐 **Infrastructure Layout**
+## 🧠 Key Design Decisions
 
-- **VPC**: Isolated network for the application.
-- **Public Subnets**: Host Load Balancers and NAT Gateways.
-- **Private Subnets**: Host EKS worker nodes.
-- **2 Availability Zones**: Ensure fault tolerance and high availability.
-- **NAT Gateways**: Allow worker nodes in private subnets to access the internet securely.
-- **Internet Gateway**: Provides internet access for public resources.
-- **DynamoDB**: Serverless, managed NoSQL database accessible from EKS pods.
-- **CloudWatch + SNS**: Provide real-time alerting and notifications.
+| Feature | Best Practice |
+|----------|----------------|
+| **VPC Endpoint for DynamoDB** | Created as a separate module for modularity and future scalability. |
+| **Private Communication** | EKS worker nodes access DynamoDB privately via Gateway Endpoint. |
+| **Security** | No public access to database; IAM-based authentication for pods or node roles. |
+| **Monitoring** | CloudWatch alarms trigger SNS → Gmail for incident alerts. |
+| **GitOps Workflow** | Jenkins triggers ArgoCD deployment after build and image push. |
 
 ---
 
-## 📂 **Repository Structure Example**
+## 🚀 Deployment Steps
 
-```bash
-project-root/
-│
-├── Terraform/
-│   ├── main.tf
-│   ├── variables.tf
-│   ├── outputs.tf
-│   └── modules/
-│
-├── manifests/
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   ├── ingress.yaml
-│   └── configmap.yaml     # contains DynamoDB table name and env vars
-│
-├── .github/
-│   └── workflows/
-│       └── ci.yml
-│
-├── src/
-│   ├── app.py
-│   ├── requirements.txt
-│   └── Dockerfile
-│
-└── README.md
+1. **Initialize Terraform**
+   ```
+   terraform init
+   ```
+
+Validate and Plan
+   ```
+terraform validate
+terraform plan
+   ```
+Apply Infrastructure
+   ```
+terraform apply -auto-approve
+   ```
+
+Verify VPC Endpoint
+   ```
+aws ec2 describe-vpc-endpoints --filters "Name=service-name,Values=com.amazonaws.${region}.dynamodb"
+   ```
+
+Check DynamoDB Access
+
+From your EKS pod:
+   ```
+aws dynamodb list-tables --region <region>
+   ```
+Should work without internet access.
+
+Test Monitoring Alerts
+
+Trigger a CloudWatch alarm threshold and verify you receive an email via SNS → Gmail.
+
+📬 CloudWatch → SNS → Gmail Alert Flow
+
+-  CloudWatch Alarm monitors metrics (CPU, memory, etc.)
+
+-On threshold breach → SNS topic triggers.
+
+-  SNS Subscription sends an email alert to the DevOps Engineer’s Gmail.
+
+-  Engineer reviews the issue and takes action immediately.
