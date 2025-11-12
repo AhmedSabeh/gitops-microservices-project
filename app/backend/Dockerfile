@@ -1,26 +1,14 @@
-# ---------- Stage 1: Build ----------
+# Stage 1: Install dependencies
 FROM node:20-alpine AS builder
-
 WORKDIR /app
-
-# Copy package files first for better caching
 COPY package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN npm install --only=production
-
-# Copy source code
-COPY . .
-
-# ---------- Stage 2: Runtime ----------
+# Stage 2: Run backend
 FROM node:20-alpine
-
 WORKDIR /app
-
-# Copy built files and node_modules from builder
-COPY --from=builder /app /app
-
-EXPOSE 8080
-
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
+EXPOSE 5000
 CMD ["node", "server.js"]
 
