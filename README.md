@@ -11,6 +11,8 @@ The following diagram shows the full cloud infrastructure and GitOps workflow fo
 
 <img width="2749" height="2145" alt="a new one" src="https://github.com/user-attachments/assets/cb639169-c08c-424f-b17e-c4a4a029ec12" />
 
+
+
 | Component                  | Description |
 |----------------------------|-------------|
 | **VPC**                    | Custom VPC with public and private subnets across **2 Availability Zones**. |
@@ -40,45 +42,57 @@ The following diagram shows the full cloud infrastructure and GitOps workflow fo
 ```
 gitops-microservices-project/
 ├── README.md
-|
 ├── terraform/
-│ ├── main.tf
-│ ├── variables.tf
-│ ├── outputs.tf
-│ ├── backend.tf
-│ ├── modules/
-│ │ ├── vpc/
-│ │ ├── eks/
-│ │ ├── dynamodb/
-│ │ ├── vpc_endpoint_dynamodb/
-│ │ └── cloudwatch/
-| |
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── backend.tf
+│   └── modules/
+│       ├── cloudwatch/
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── dynamodb/
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── eks/
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── vpc/
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       └── vpc-endpoint/
+│           ├── main.tf
+│           ├── outputs.tf
+│           └── variables.tf
 ├── Kubernetes/
-│ ├── deployment.yaml
-│ ├── service.yaml
-│ └── namespace.yaml
-| |
+│   ├── backend/
+│   │   ├── deployment.yaml
+│   │   └── service.yaml
+│   ├── frontend/
+│   │   ├── deployment.yaml
+│   │   └── service.yaml
+│   ├── ingress.yaml
+│   └── namespace.yaml
 ├── github/
-│ └── workflows/
-│ | └── ci.yml
-| |
+│   └── workflows/
+│       └── ci.yml
 ├── ArgoCD/
-│ └── README.md
-| |
-├── Docker
-│ └── eat-n-split
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── package-lock.json
-│ ├── public
-│   ├── favicon.ico
-│   └── index.html
-│   ├── README.md
-│ └── src
-│   ├── App.js
-│   ├── index.css
-|   └── index.js
-
+│   └── README.md
+└── app/
+    ├── backend/
+    │   ├── app.js
+    │   ├── package.json
+    │   └── Dockerfile
+    └── frontend/
+        ├── src/
+        ├── public/
+        ├── package.json
+        ├── nginx.conf
+        └── Dockerfile
 ```
 
 ---
@@ -102,31 +116,31 @@ gitops-microservices-project/
 cd terraform
 terraform init
 ```
-2️⃣ Validate and Plan
+### 2️⃣ Validate and Plan
 ```
 terraform validate
 terraform plan
 ```
-3️⃣ Apply Infrastructure
+### 3️⃣ Apply Infrastructure
 ```
 terraform apply -auto-approve
 ```
-4️⃣ Verify VPC Endpoint
+### 4️⃣ Verify VPC Endpoint
 ```
 aws ec2 describe-vpc-endpoints --filters "Name=service-name,Values=com.amazonaws.${region}.dynamodb"
 ```
-5️⃣ Check DynamoDB Access
+### 5️⃣ Check DynamoDB Access
 
 From your EKS pod:
 ```
 aws dynamodb list-tables --region <region>
 ```
-Should succeed without internet access.
+-    Should succeed without internet access.
 
-6️⃣ Test Monitoring Alerts
+### 6️⃣ Test Monitoring Alerts
 
-Trigger a CloudWatch alarm threshold and verify email via SNS → Gmail.
-
+-    Trigger a CloudWatch alarm threshold and verify email via SNS → Gmail.
+```
 📬 CloudWatch → SNS → Gmail Alert Flow
 CloudWatch Alarm monitors metrics (CPU, memory, etc.)
         |
@@ -138,19 +152,20 @@ SNS subscription sends email alert to DevOps Engineer’s Gmail
         |
         v
 Engineer reviews issue and takes immediate action
+```
 
-🐳 GitHub Actions CI/CD Flow
+### 🐳 GitHub Actions CI/CD Flow
 
-CI Workflow
+#### CI Workflow
 
-Build Docker images for frontend/backend.
+-    Build Docker images for frontend/backend.
 
-Run unit tests.
+-    Run unit tests.
 
-Push images to Dockerhub.
+-    Push images to Dockerhub.
 
-CD Workflow
+#### CD Workflow
 
-Trigger ArgoCD to deploy the latest images to EKS.
+-    Trigger ArgoCD to deploy the latest images to EKS.
 
-Update Kubernetes manifests in Git repository.
+-    Update Kubernetes manifests in Git repository.
