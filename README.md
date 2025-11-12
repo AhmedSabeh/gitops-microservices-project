@@ -13,21 +13,20 @@ The following diagram shows the full cloud infrastructure and GitOps workflow fo
 
 | Component                  | Description |
 |----------------------------|-------------|
-| **VPC**                    | Custom VPC with public and private subnets across **3 Availability Zones**. |
-| **EC2 Instances**          | Optional EC2 instances (for testing or GitHub Actions runners). |
+| **VPC**                    | Custom VPC with public and private subnets across **2 Availability Zones**. |
 | **EKS Cluster**            | Managed Kubernetes cluster hosting microservices (frontend, backend). |
 | **DynamoDB**               | Serverless NoSQL database used by backend microservice. |
 | **VPC Endpoint (Gateway)** | Enables **private communication** between EKS Worker Nodes and DynamoDB **without internet access**. |
 | **CloudWatch**             | Monitors EC2, EKS, and custom metrics. |
 | **SNS → Gmail Alerts**     | CloudWatch alarms trigger SNS notifications to DevOps Engineer’s Gmail inbox. |
 | **ArgoCD**                 | Continuous Delivery tool for GitOps deployments to EKS. |
-| **GitHub Actions**         | CI/CD automation: builds Docker images, pushes to ECR, triggers ArgoCD deployments. |
+| **GitHub Actions**         | CI/CD automation: builds Docker images, pushes to Dockerhub, triggers ArgoCD deployments. |
 
 ---
 
 ## ⚙️ Tools & Technologies
 
-- **AWS**: EC2, EKS, DynamoDB, CloudWatch, SNS, IAM, VPC  
+- **AWS**: Dockerhub, EKS, DynamoDB, CloudWatch, SNS, IAM, VPC  
 - **Terraform**: Infrastructure-as-Code (modular structure)  
 - **GitHub Actions**: CI/CD automation and GitOps integration  
 - **Docker**: Containerization of frontend and backend services  
@@ -49,17 +48,15 @@ gitops-microservices-project/
 │ ├── backend.tf
 │ ├── modules/
 │ │ ├── vpc/
-│ │ ├── ec2/
 │ │ ├── eks/
 │ │ ├── dynamodb/
 │ │ ├── vpc_endpoint_dynamodb/
-│ │ ├── cloudwatch/
-│ │ └── sns/
+│ │ └── cloudwatch/
 | |
 ├── Kubernetes/
 │ ├── deployment.yaml
 │ ├── service.yaml
-│ │ └── namespace.yaml
+│ └── namespace.yaml
 | |
 ├── github/
 │ └── workflows/
@@ -83,7 +80,7 @@ gitops-microservices-project/
 | **Private Communication** | EKS worker nodes access DynamoDB via **Gateway Endpoint**, no internet required. |
 | **Security** | Database has **no public access**; uses **IAM-based authentication** for pods or node roles. |
 | **Monitoring** | CloudWatch alarms trigger **SNS → Gmail** for incident alerts. |
-| **GitOps Workflow** | GitHub Actions builds Docker images → pushes to **ECR** → triggers **ArgoCD deployment**. |
+| **GitOps Workflow** | GitHub Actions builds Docker images → pushes to **Dockerhub** → triggers **ArgoCD deployment**. |
 
 ---
 
@@ -139,7 +136,7 @@ Build Docker images for frontend/backend.
 
 Run unit tests.
 
-Push images to Amazon ECR.
+Push images to Dockerhub.
 
 CD Workflow
 
