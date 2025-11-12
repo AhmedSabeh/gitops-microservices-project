@@ -4,19 +4,18 @@ variable "cluster_name" {
 }
 
 variable "cluster_version" {
-  description = "The version of the EKS cluster"
+  description = "Kubernetes version for EKS cluster"
   type        = string
-  default     = "1.29"
+  default     = "1.31"
 }
 
-variable "subnet_ids" {
-  description = "List of subnet IDs used by the EKS cluster and nodes"
+variable "private_subnets" {
+  description = "List of private subnet IDs for EKS worker nodes"
   type        = list(string)
 }
 
-
 variable "instance_types" {
-  description = "EC2 instance types for the node group"
+  description = "EC2 instance types for worker nodes"
   type        = list(string)
   default     = ["t3.micro"]
 }
