@@ -62,12 +62,23 @@ gitops-microservices-project/
 │ └── workflows/
 │ | └── ci.yml
 | |
-├── argo/
+├── ArgoCD/
 │ └── README.md
 | |
-├── docker/
-│ ├── frontend/
-│ └── backend/
+├── Docker
+│ └── eat-n-split
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── package-lock.json
+│ ├── public
+│   ├── favicon.ico
+│   └── index.html
+│   ├── README.md
+│ └── src
+│   ├── App.js
+│   ├── index.css
+|   └── index.js
+
 ```
 
 ---
