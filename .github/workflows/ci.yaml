@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Docker Images
 
 on:
   workflow_dispatch: {}
@@ -25,10 +25,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Determine next version
-        id: version
+      # ---------------- BACKEND VERSION ----------------
+      - name: Determine next backend version
+        id: backend_version
         run: |
-          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/sabeh-app
+          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/taskify-backend
           TAGS=$(curl -s https://hub.docker.com/v2/repositories/$IMAGE/tags/?page_size=100 | jq -r '.results[].name' | grep -E '^[0-9]+\.[0-9]+$' | sort -V || echo "")
           if [ -z "$TAGS" ]; then
             NEXT_TAG="1.0"
@@ -39,34 +40,78 @@ jobs:
             NEXT_MINOR=$((MINOR + 1))
             NEXT_TAG="${MAJOR}.${NEXT_MINOR}"
           fi
-          echo "Next version: $NEXT_TAG"
+          echo "Next backend version: $NEXT_TAG"
           echo "tag=$NEXT_TAG" >> $GITHUB_OUTPUT
 
-      - name: Build and tag Docker image
+      # ---------------- FRONTEND VERSION ----------------
+      - name: Determine next frontend version
+        id: frontend_version
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/sabeh-app:${{ steps.version.outputs.tag }} -f Docker/Dockerfile Docker/
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/sabeh-app:${{ steps.version.outputs.tag }} ${{ secrets.DOCKERHUB_USERNAME }}/sabeh-app:latest
+          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/taskify-frontend
+          TAGS=$(curl -s https://hub.docker.com/v2/repositories/$IMAGE/tags/?page_size=100 | jq -r '.results[].name' | grep -E '^[0-9]+\.[0-9]+$' | sort -V || echo "")
+          if [ -z "$TAGS" ]; then
+            NEXT_TAG="1.0"
+          else
+            LATEST_TAG=$(echo "$TAGS" | tail -n 1)
+            MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
+            MINOR=$(echo $LATEST_TAG | cut -d. -f2)
+            NEXT_MINOR=$((MINOR + 1))
+            NEXT_TAG="${MAJOR}.${NEXT_MINOR}"
+          fi
+          echo "Next frontend version: $NEXT_TAG"
+          echo "tag=$NEXT_TAG" >> $GITHUB_OUTPUT
 
-      - name: Scan image with Trivy
+      # ---------------- BUILD & PUSH BACKEND ----------------
+      - name: Build backend image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/taskify-backend:${{ steps.backend_version.outputs.tag }} -f app/backend/Dockerfile app/backend
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/taskify-backend:${{ steps.backend_version.outputs.tag }} ${{ secrets.DOCKERHUB_USERNAME }}/taskify-backend:latest
+
+      - name: Scan backend image with Trivy
         uses: aquasecurity/trivy-action@0.20.0
         with:
-          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/sabeh-app:${{ steps.version.outputs.tag }}
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/taskify-backend:${{ steps.backend_version.outputs.tag }}
           format: table
           severity: HIGH,CRITICAL
           ignore-unfixed: true
 
-      - name: Push Docker image
+      - name: Push backend image
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/sabeh-app:${{ steps.version.outputs.tag }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/sabeh-app:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/taskify-backend:${{ steps.backend_version.outputs.tag }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/taskify-backend:latest
 
+      # ---------------- BUILD & PUSH FRONTEND ----------------
+      - name: Build frontend image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/taskify-frontend:${{ steps.frontend_version.outputs.tag }} -f app/frontend/Dockerfile app/frontend
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/taskify-frontend:${{ steps.frontend_version.outputs.tag }} ${{ secrets.DOCKERHUB_USERNAME }}/taskify-frontend:latest
+
+      - name: Scan frontend image with Trivy
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/taskify-frontend:${{ steps.frontend_version.outputs.tag }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+
+      - name: Push frontend image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/taskify-frontend:${{ steps.frontend_version.outputs.tag }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/taskify-frontend:latest
+
+      # ---------------- UPDATE KUBERNETES MANIFESTS ----------------
       - name: Update Kubernetes manifests
         run: |
-          IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/sabeh-app
-          IMAGE_TAG=${{ steps.version.outputs.tag }}
-          sed -i "s|image: .*|image: $IMAGE_NAME:$IMAGE_TAG|" Kubernetes/deployment.yaml
+          BACKEND_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/taskify-backend:${{ steps.backend_version.outputs.tag }}
+          FRONTEND_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/taskify-frontend:${{ steps.frontend_version.outputs.tag }}
+
+          # Update backend and frontend deployment files
+          sed -i "s|image: .*taskify-backend.*|image: $BACKEND_IMAGE|" Kubernetes/backend-deployment.yaml || true
+          sed -i "s|image: .*taskify-frontend.*|image: $FRONTEND_IMAGE|" Kubernetes/frontend-deployment.yaml || true
+
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add Kubernetes/deployment.yaml
-          git commit -m "Update image to $IMAGE_TAG" || echo "No changes"
+          git add Kubernetes/*.yaml
+          git commit -m "Update backend:${{ steps.backend_version.outputs.tag }}, frontend:${{ steps.frontend_version.outputs.tag }}" || echo "No changes"
           git push origin main || echo "Push failed, maybe no permission"
+
