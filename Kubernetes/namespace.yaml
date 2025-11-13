@@ -1,4 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: sabeh-app
+  name: taskify
+  labels:
+    project: gitops-microservices
+
