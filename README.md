@@ -129,13 +129,17 @@ terraform apply -auto-approve
 ```
 aws ec2 describe-vpc-endpoints --filters "Name=service-name,Values=com.amazonaws.${region}.dynamodb"
 ```
+<img width="1220" height="436" alt="Screenshot (449)" src="https://github.com/user-attachments/assets/07384495-09fd-403a-84a7-fe6b9265d6f4" />
+<img width="1224" height="440" alt="Screenshot (450)" src="https://github.com/user-attachments/assets/a7473e7f-5a95-4f38-b827-bd4723d7895b" />
+
 ### 5️⃣ Check DynamoDB Access
 
 From your EKS pod:
 ```
 aws dynamodb list-tables --region us-east-1
 ```
--    Should succeed without internet access.
+<img width="1204" height="120" alt="Screenshot (448)" src="https://github.com/user-attachments/assets/691afd41-0fc3-4ecf-8235-c3304f38110e" />
+
 
 ### 6️⃣ Test Monitoring Alerts
 
