@@ -1,13 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: taskify-backend-svc
+  name: backend-service
   namespace: taskify
 spec:
-  type: ClusterIP
   selector:
-    app: taskify-backend
+    app: backend
   ports:
-    - port: 8080
-      targetPort: 8080
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP
 

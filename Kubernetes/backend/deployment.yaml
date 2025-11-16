@@ -1,47 +1,44 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backend-sa
+  namespace: taskify
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::038686089624:role/sabeh-cluster-backend-irsa
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: taskify-frontend
+  name: backend-deployment
   namespace: taskify
   labels:
-    app: taskify-frontend
-    project: taskify
+    app: backend
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: taskify-frontend
+      app: backend
   template:
     metadata:
       labels:
-        app: taskify-frontend
-        project: taskify
+        app: backend
     spec:
+      serviceAccountName: backend-sa
       containers:
-        - name: frontend
-          image: ahmedsabeh/taskify-frontend:1.0
-          ports:
-            - containerPort: 80
+        - name: backend
+          image: ahmedsabeh/backend-app:1.3
           env:
-            - name: REACT_APP_API_URL
-              value: "http://taskify-backend-svc.taskify.svc.cluster.local:8080"
+            - name: DYNAMO_TABLE
+              value: "sabeh-app-db" 
+            - name: AWS_REGION
+              value: "us-east-1"
+          ports:
+            - containerPort: 5000
           resources:
             requests:
-              cpu: 50m
-              memory: 64Mi
+              memory: "100Mi"
+              cpu: "128m"
             limits:
-              cpu: 200m
-              memory: 128Mi
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 15
-            periodSeconds: 20
+              memory: "200Mi"
+              cpu: "256m"
 

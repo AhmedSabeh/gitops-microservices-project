@@ -1,47 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: taskify-frontend
+  name: frontend-deployment
   namespace: taskify
   labels:
-    app: taskify-frontend
-    project: taskify
+    app: frontend
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: taskify-frontend
+      app: frontend
   template:
     metadata:
       labels:
-        app: taskify-frontend
-        project: taskify
+        app: frontend
     spec:
       containers:
         - name: frontend
-          image: ahmedsabeh/taskify-frontend:1.0
+          image: ahmedsabeh/frontend-app:2.1
           ports:
             - containerPort: 80
-          env:
-            - name: REACT_APP_API_URL
-              value: "http://taskify-backend-svc.taskify.svc.cluster.local:8080"
           resources:
             requests:
-              cpu: 50m
-              memory: 64Mi
+              memory: "32Mi"
+              cpu: "25m"
             limits:
-              cpu: 200m
-              memory: 128Mi
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 15
-            periodSeconds: 20
+              memory: "64Mi"
+              cpu: "50m"
 

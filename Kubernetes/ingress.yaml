@@ -4,11 +4,9 @@ metadata:
   name: taskify-ingress
   namespace: taskify
   annotations:
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: alb
+  ingressClassName: nginx
   rules:
     - http:
         paths:
@@ -16,7 +14,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: taskify-frontend-svc
+                name: frontend-svc
                 port:
                   number: 80
-
