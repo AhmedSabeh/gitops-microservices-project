@@ -1,6 +1,6 @@
 # Taskify Application - ArgoCD Deployment
 
-This folder contains **documentation for deploying the Taskify app using ArgoCD**.
+Step-by-step guide for implementing GitOps with ArgoCD to deploy and maintain the Taskify frontend and backend applications on a Kubernetes cluster.
 
 ---
 
@@ -23,7 +23,7 @@ This folder contains **documentation for deploying the Taskify app using ArgoCD*
 # Get admin password
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
-### Port-forward ArgoCD server
+### 2. Port-forward ArgoCD server
 ```
 kubectl port-forward svc/argocd-server -n argocd 9090:443
 Access GUI: http://localhost:9090
@@ -34,7 +34,7 @@ Access GUI: http://localhost:9090
 
 -  Password: from command above
 
-### 2. Connect Repository
+### 3. Connect Repository
 
 -  Repository URL: https://github.com/AhmedSabeh/gitops-microservices-project
 
@@ -44,7 +44,7 @@ Access GUI: http://localhost:9090
 
 -  Auth: None (public repo)
 
-### 3. Create Application in GUI
+### 4. Create Application in GUI
 
 -  Application Name: taskify-app
 
@@ -60,7 +60,7 @@ Access GUI: http://localhost:9090
 
 <img width="1366" height="584" alt="Screenshot (428)" src="https://github.com/user-attachments/assets/99bd4dae-5547-41b5-83f6-c90634467302" />
 
-### 4. Sync & Verify
+### 5. Sync & Verify
 
 -  Click Sync → all resources will be applied
 
@@ -68,7 +68,7 @@ Access GUI: http://localhost:9090
 
 -  Pods should show Running / Healthy
 
-### 5. GitOps Workflow
+### 6. GitOps Workflow
 
 -  Push changes to main → ArgoCD detects them → auto-syncs cluster
 
