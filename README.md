@@ -69,14 +69,14 @@ gitops-microservices-project/
 │           ├── outputs.tf
 │           └── variables.tf
 ├── Kubernetes/
-│   ├── backend/
-│   │   ├── deployment.yaml
-│   │   └── service.yaml
-│   ├── frontend/
-│   │   ├── deployment.yaml
-│   │   └── service.yaml
+│   ├── backend-deployment.yaml
+│   ├── backend-service.yaml
+│   ├── frontend-deployment.yaml
+│   ├── frontend-service.yaml
 │   ├── ingress.yaml
-│   └── namespace.yaml
+│   ├── namespace.yaml
+|   └── README.md
+|
 ├── github/
 │   └── workflows/
 │       └── ci.yml
@@ -84,13 +84,11 @@ gitops-microservices-project/
 │   └── README.md
 └── app/
     ├── backend/
-    │   ├── app.js
-    │   ├── package.json
+    │   ├── app.py
+    │   ├── requirements.txt
     │   └── Dockerfile
     └── frontend/
-        ├── src/
-        ├── public/
-        ├── package.json
+        ├── index.html
         ├── nginx.conf
         └── Dockerfile
 ```
@@ -125,6 +123,8 @@ terraform plan
 ```
 terraform apply -auto-approve
 ```
+<img width="1021" height="401" alt="Screenshot (415)" src="https://github.com/user-attachments/assets/770176f2-823c-42a4-9397-60d7cb688a9b" />
+
 ### 4️⃣ Verify VPC Endpoint
 ```
 aws ec2 describe-vpc-endpoints --filters "Name=service-name,Values=com.amazonaws.${region}.dynamodb"
@@ -133,7 +133,7 @@ aws ec2 describe-vpc-endpoints --filters "Name=service-name,Values=com.amazonaws
 
 From your EKS pod:
 ```
-aws dynamodb list-tables --region <region>
+aws dynamodb list-tables --region us-east-1
 ```
 -    Should succeed without internet access.
 
@@ -164,8 +164,19 @@ Engineer reviews issue and takes immediate action
 
 -    Push images to Dockerhub.
 
+<img width="1366" height="397" alt="Screenshot (442)" src="https://github.com/user-attachments/assets/2efeb00b-b916-4744-b016-3d355eb6cf10" />
+
 #### CD Workflow
 
 -    Trigger ArgoCD to deploy the latest images to EKS.
 
 -    Update Kubernetes manifests in Git repository.
+
+---
+
+## 🖥️ Live Application
+
+The following screenshot shows the **Taskify application running on EKS**.  
+Frontend is served via Nginx and displays tasks fetched from the backend Flask API connected to DynamoDB:
+<img width="1366" height="563" alt="Screenshot (446)" src="https://github.com/user-attachments/assets/72ff2b2f-ca73-42d3-ba61-6b709a46dadc" />
+
