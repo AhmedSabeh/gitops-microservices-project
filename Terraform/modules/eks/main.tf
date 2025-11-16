@@ -91,5 +91,105 @@ resource "aws_eks_node_group" "eks_nodes" {
   tags = {
     Project = var.cluster_name
   }
+  
+  depends_on = [
+    aws_iam_role_policy_attachment.node_worker_policy,
+    aws_iam_role_policy_attachment.node_cni_policy,
+    aws_iam_role_policy_attachment.node_ecr_readonly
+  ]
+
+}
+
+resource "aws_security_group" "eks_nodes_sg" {
+  name        = "${var.cluster_name}-nodes-sg"
+  description = "EKS worker nodes security group"
+  vpc_id      = var.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Project = var.cluster_name
+  }
+}
+
+
+
+
+
+
+
+data "aws_iam_policy_document" "backend_dynamodb_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "dynamodb:Scan",
+      "dynamodb:Query",
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:GetItem",
+      "dynamodb:DeleteItem"
+    ]
+    resources = [
+      var.task_table_arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "backend_dynamodb" {
+  name   = "${var.cluster_name}-backend-dynamodb-policy"
+  policy = data.aws_iam_policy_document.backend_dynamodb_policy.json
+}
+
+
+
+# Get the EKS cluster info
+data "aws_eks_cluster" "eks" {
+  name = aws_eks_cluster.eks.name
+}
+
+
+# Create IAM OIDC provider for EKS
+resource "aws_iam_openid_connect_provider" "eks_oidc" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"] # default EKS thumbprint
+  url             = aws_eks_cluster.eks.identity[0].oidc[0].issuer
+}
+
+data "aws_iam_policy_document" "backend_assume_role" {
+  statement {
+    effect = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.eks_oidc.arn]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}:sub"
+      values   = ["system:serviceaccount:taskify:backend-sa"]
+    }
+  }
+}
+
+resource "aws_iam_role" "backend_irsa_role" {
+  name               = "${var.cluster_name}-backend-irsa"
+  assume_role_policy = data.aws_iam_policy_document.backend_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "backend_attach" {
+  role       = aws_iam_role.backend_irsa_role.name
+  policy_arn = aws_iam_policy.backend_dynamodb.arn
 }
 

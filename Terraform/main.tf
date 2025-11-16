@@ -1,6 +1,7 @@
 module "vpc" {
   source               = "./modules/vpc"
   project_name         = var.project_name
+  cluster_name         = var.cluster_name
   vpc_cidr             = var.vpc_cidr
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
@@ -10,12 +11,14 @@ module "vpc" {
 module "eks" {
   source            = "./modules/eks"
   cluster_name      = var.cluster_name
-  cluster_version   = "1.31"
+  vpc_id          = module.vpc.vpc_id
+  cluster_version   = "1.32"
   private_subnets   = module.vpc.private_subnet_ids
-  instance_types    = ["t3.micro"]
+  instance_types    = ["t3.small"]
   desired_size      = 2
   min_size          = 1
-  max_size          = 2
+  max_size          = 3
+  task_table_arn = module.dynamodb.dynamodb_table_arn
 }
 
 module "dynamodb" {

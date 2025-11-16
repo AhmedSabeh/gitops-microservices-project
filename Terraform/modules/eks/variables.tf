@@ -6,7 +6,7 @@ variable "cluster_name" {
 variable "cluster_version" {
   description = "Kubernetes version for EKS cluster"
   type        = string
-  default     = "1.31"
+  default     = "1.32"
 }
 
 variable "private_subnets" {
@@ -17,7 +17,7 @@ variable "private_subnets" {
 variable "instance_types" {
   description = "EC2 instance types for worker nodes"
   type        = list(string)
-  default     = ["t3.micro"]
+  default     = ["t3.small"]
 }
 
 variable "desired_size" {
@@ -35,6 +35,16 @@ variable "min_size" {
 variable "max_size" {
   description = "Maximum number of worker nodes"
   type        = number
-  default     = 2
+  default     = 3
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "VPC ID where EKS cluster is deployed"
+}
+
+variable "task_table_arn" {
+  description = "ARN of the DynamoDB table for backend IRSA"
+  type        = string
 }
 

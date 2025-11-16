@@ -12,3 +12,8 @@ variable "private_subnet_cidrs" {
 variable "azs" {
   type = list(string)
 }
+
+variable "cluster_name" {
+  description = "EKS cluster name, used for tagging subnets"
+  type        = string
+}
