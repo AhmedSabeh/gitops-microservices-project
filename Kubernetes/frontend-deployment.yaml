@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ahmedsabeh/frontend-app:1.0
+          image: ahmedsabeh/taskify-frontend:1.1
           ports:
             - containerPort: 80
           resources:
