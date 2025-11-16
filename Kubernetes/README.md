@@ -11,21 +11,17 @@ This project demonstrates a **microservices deployment using Kubernetes** with a
 ---
 
 ## 🏗 Architecture
-
-Frontend Pod (Nginx)
+```
+Frontend Pod 
 |
 v
-Backend Pod (Flask) ---> DynamoDB
+Backend Pod ---> DynamoDB
 |
 v
 Ingress (Helm) exposes frontend externally
+```
 
-
-- Frontend fetches tasks from the backend via `http://backend-svc:5000/tasks`  
-- Backend remains **internal**, accessible only by frontend (ClusterIP service)  
-- Pods are scheduled on **separate node groups** for frontend and backend  
-
----
+---- 
 
 ## 📦 Kubernetes Components
 
@@ -41,51 +37,68 @@ Ingress (Helm) exposes frontend externally
 ---
 
 ## 🏗 Project Structure
+```
 Kubernetes/
-├── frontend/
-│ └── deployment.yaml
-├── backend/
-│ └── deployment.yaml
+├── backend-deployment.yaml
+├── backend-service.yaml
+├── frontend-deployment.yaml
+├── frontend-service.yaml
+├── ingress.yaml
+├── namespace.yaml
 └── README.md
-
+```
 
 ---
 
 ## 🚀 Deployment Steps
 
-### 1. Apply Backend
-```bash
-kubectl apply -f Kubernetes/backend/deployment.yaml
+### 1. Apply namespace
+```
+kubectl apply -f namespace.yaml
+```
 
-Deploys Flask backend pods on backend-labeled nodes
+### 2. Apply Backend
+```
+kubectl apply -f backend-deployment.yaml
+kubectl apply -f backend-service.yaml
 
-Exposes backend via ClusterIP service
+```
+-  Deploys Flask backend pods on backend-labeled nodes
+
+-  Exposes backend via ClusterIP service
 
 
-2. Apply Frontend
-kubectl apply -f Kubernetes/frontend/deployment.yaml
-Deploys Nginx frontend pods on frontend-labeled nodes
+### 3. Apply Frontend
+```
+kubectl apply -f frontend-deployment.yaml
+kubectl apply -f frontend-service.yaml
+```
+-  Deploys Nginx frontend pods on frontend-labeled nodes
 
-Configured to fetch tasks from backend service
+-  Configured to fetch tasks from backend service
 
-3. Deploy Ingress via Helm
+### 4. Deploy Ingress via Helm
 
-# Add Helm repo for ingress-nginx
+-  Add Helm repo for ingress-nginx
+```
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
-
-# Install ingress controller
+```
+-  Install ingress controller
+```
 helm install taskify-ingress ingress-nginx/ingress-nginx
+```
 
-Helm installs the Ingress controller
+-  Helm installs the Ingress controller
 
-Exposes frontend externally
+-  Exposes frontend externally
 
-Backend remains internal (ClusterIP service)
+-  Backend remains internal (ClusterIP service)
 
 
-4. Verify Deployment
-kubectl get pods
-kubectl get svc
-kubectl get ingress
-
+### 5. Verify Deployment
+```
+kubectl get pods -n taskify
+kubectl get svc -n taskify 
+kubectl get ingress -n taskify
+```
