@@ -61,7 +61,6 @@ kubectl apply -f namespace.yaml
 ```
 kubectl apply -f backend-deployment.yaml
 kubectl apply -f backend-service.yaml
-
 ```
 -  Deploys Flask backend pods on backend-labeled nodes
 
@@ -88,6 +87,10 @@ helm repo update
 ```
 helm install taskify-ingress ingress-nginx/ingress-nginx
 ```
+<img width="1024" height="360" alt="Screenshot (417)" src="https://github.com/user-attachments/assets/cfcc91a0-ff03-4e6a-b12d-8291e8580e7a" />
+<img width="1019" height="472" alt="Screenshot (418)" src="https://github.com/user-attachments/assets/9ff30898-44a0-4f01-a504-6fb357140658" />
+<img width="1022" height="480" alt="Screenshot (419)" src="https://github.com/user-attachments/assets/b891acbc-85e7-4178-abb9-7ce5f30918f5" />
+<img width="1026" height="486" alt="Screenshot (420)" src="https://github.com/user-attachments/assets/f34ce542-8493-4f52-91e4-fe86c34fbae5" />
 
 -  Helm installs the Ingress controller
 
@@ -102,3 +105,5 @@ kubectl get pods -n taskify
 kubectl get svc -n taskify 
 kubectl get ingress -n taskify
 ```
+<img width="1025" height="367" alt="Screenshot (421)" src="https://github.com/user-attachments/assets/5b31e470-3e10-4a62-b4e0-5aaded6ab871" />
+
