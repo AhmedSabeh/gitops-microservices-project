@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Manager</title>
+</head>
+<body>
+    <h1>Task Manager</h1>
+    <input type="text" id="taskId" placeholder="Task ID"/>
+    <input type="text" id="taskName" placeholder="Task Name"/>
+    <button onclick="addTask()">Add Task</button>
+
+    <h2>Tasks:</h2>
+    <ul id="taskList"></ul>
+
+<script>
+const API_URL = "http://backend-svc:5000/tasks";
+
+async function addTask() {
+    const id = document.getElementById("taskId").value.trim();
+    const name = document.getElementById("taskName").value.trim();
+
+    if (!id || !name) {
+        alert("Please enter both ID and Name!");
+        return;
+    }
+
+    try {
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, name })
+        });
+
+        const data = await res.json();
+        console.log("Task added:", data);
+
+        // Clear input fields
+        document.getElementById("taskId").value = "";
+        document.getElementById("taskName").value = "";
+
+        loadTasks(); // Refresh task list immediately
+    } catch (err) {
+        console.error("Error adding task:", err);
+        alert("Failed to add task. Check console for details.");
+    }
+}
+
+async function loadTasks() {
+    try {
+        const res = await fetch(API_URL + "?_=" + Date.now()); // Cache-busting
+        const tasks = await res.json();
+        const list = document.getElementById("taskList");
+        list.innerHTML = "";
+
+        tasks.forEach(task => {
+            const li = document.createElement("li");
+            li.textContent = `${task.id}: ${task.name}`;
+            list.appendChild(li);
+        });
+    } catch (err) {
+        console.error("Failed to fetch tasks:", err);
+    }
+}
+
+// Initial load
+loadTasks();
+
+// Auto-refresh every 5 seconds
+setInterval(loadTasks, 5000);
+</script>
+</body>
+</html>
+

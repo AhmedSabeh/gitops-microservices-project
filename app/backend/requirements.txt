@@ -1,0 +1,4 @@
+Flask==2.3.3
+boto3
+flask-cors
+
