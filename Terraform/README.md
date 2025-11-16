@@ -44,72 +44,74 @@ terraform/
          ├── outputs.tf
          └── variables.tf
 ```
-⚙️ Terraform Modules
-1. VPC Module
+## ⚙️ Terraform Modules
+### 1. VPC Module
 
-Creates a custom VPC with public/private subnets.
+- Creates a custom VPC with public/private subnets.
 
-Supports multi-AZ deployments for high availability.
+- Supports multi-AZ deployments for high availability.
 
-Configures route tables, internet gateways, NAT gateways, and security groups.
+- Configures route tables, internet gateways, NAT gateways, and security groups.
 
-2. VPC Endpoint Module
+### 2. VPC Endpoint Module
 
-Creates interface and gateway endpoints for AWS services.
+- Creates interface and gateway endpoints for AWS services.
 
-Ensures private connectivity for DynamoDB, S3, and other AWS services without traversing the internet.
+- Ensures private connectivity for DynamoDB, S3, and other AWS services without traversing the internet.
 
-3. EKS Module
+### 3. EKS Module
 
-Deploys an EKS cluster with node groups for frontend and backend workloads.
+- Deploys an EKS cluster with node groups for frontend and backend workloads.
 
-Supports labeling nodes for workload isolation.
+- Supports labeling nodes for workload isolation.
 
-Integrates with IAM roles and policies for secure cluster access.
+- Integrates with IAM roles and policies for secure cluster access.
 
-4. DynamoDB Module
+### 4. DynamoDB Module
 
-Creates a NoSQL table for microservices backend data storage.
+- Creates a NoSQL table for microservices backend data storage.
 
-Configurable read/write capacity and TTL settings for cleanup policies.
+- Configurable read/write capacity and TTL settings for cleanup policies.
 
-5. CloudWatch Module
+### 5. CloudWatch Module
 
-Sets up CloudWatch log groups for microservices logs.
+- Sets up CloudWatch log groups for microservices logs.
 
-Supports metrics collection and alerting for cluster monitoring.
+- Supports metrics collection and alerting for cluster monitoring.
 
-🚀 Deployment Steps
+## 🚀 Deployment Steps
 
-Configure AWS CLI and Terraform backend:
-
+- Configure AWS CLI and Terraform backend:
+```
 aws configure
 terraform init
+```
 
-
-Plan the infrastructure:
-
+- Plan the infrastructure:
+```
 terraform plan
+```
 
-
-Apply the Terraform configuration:
-
+- Apply the Terraform configuration:
+```
 terraform apply -auto-approve
+```
+<img width="1221" height="420" alt="Screenshot (453)" src="https://github.com/user-attachments/assets/9124991f-eb8e-497d-b488-54faf55c2f17" />
 
-
-Verify resources:
-
+- Verify resources:
+```
 terraform show
 kubectl get nodes -o wide
 kubectl get pods -A
+```
+<img width="1212" height="362" alt="Screenshot (454)" src="https://github.com/user-attachments/assets/b8dc7ca6-684e-492c-bd6b-84e339feb122" />
 
+## 🔐 Security & Best Practices
 
-🔐 Security & Best Practices
+- All AWS resources are tagged for cost tracking and organization.
 
-All AWS resources are tagged for cost tracking and organization.
+- VPC endpoints ensure private service access.
 
-VPC endpoints ensure private service access.
+- Node groups are segregated by workload type (frontend/backend).
 
-Node groups are segregated by workload type (frontend/backend).
-
-CloudWatch collects logs for observability.
+- CloudWatch collects logs for observability.
