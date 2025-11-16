@@ -1,19 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Task Manager</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: #111827;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --accent: #6366f1;
+        --accent-2: #22c55e;
+        --danger: #ef4444;
+        --card: #1f2937;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; padding: 32px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        background: radial-gradient(1200px 800px at 20% -20%, #1d2a53 0%, var(--bg) 45%), var(--bg);
+        color: var(--text);
+      }
+      .container { max-width: 960px; margin: 0 auto; }
+      header { display:flex; align-items:center; justify-content:space-between; margin-bottom: 24px; }
+      h1 { font-weight: 700; letter-spacing: .5px; margin: 0; }
+      .panel { background: linear-gradient(180deg, #0b1222 0%, var(--panel) 100%); border: 1px solid #1f2937; border-radius: 14px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+      .inputs { display:grid; grid-template-columns: 1fr 2fr auto; gap: 12px; align-items:center; }
+      input {
+        background: var(--card);
+        border: 1px solid #334155;
+        color: var(--text);
+        padding: 10px 12px; border-radius: 10px; outline: none;
+      }
+      input::placeholder { color: var(--muted); }
+      button {
+        background: var(--accent);
+        color: white; border: none; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-weight: 600;
+        box-shadow: 0 6px 16px rgba(99,102,241,.35);
+      }
+      button:hover { filter: brightness(1.08); }
+      .subtitle { color: var(--muted); margin: 18px 4px; }
+      .grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px;
+      }
+      .card {
+        background: linear-gradient(180deg, #152036 0%, var(--card) 100%);
+        border: 1px solid #334155; border-radius: 12px; padding: 12px; position: relative;
+      }
+      .card .id {
+        font-size: 12px; color: var(--muted);
+      }
+      .card .name {
+        margin-top: 6px; font-size: 16px; font-weight: 600;
+      }
+      .badge {
+        position: absolute; right: 10px; top: 10px; font-size: 11px; padding: 4px 8px; border-radius: 999px; background: #0ea5e9; color: white;
+      }
+      .empty { border: 1px dashed #334155; border-radius: 12px; padding: 18px; text-align: center; color: var(--muted); }
+      .count { font-size: 13px; color: var(--muted); }
+      .toast {
+        position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+        background: #111827; color: var(--text); border: 1px solid #334155; border-radius: 999px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,.35);
+        opacity: 0; pointer-events: none; transition: opacity .2s ease-in-out;
+      }
+      .toast.show { opacity: 1; pointer-events: auto; }
+    </style>
 </head>
 <body>
-    <h1>Task Manager</h1>
-    <input type="text" id="taskId" placeholder="Task ID"/>
-    <input type="text" id="taskName" placeholder="Task Name"/>
-    <button onclick="addTask()">Add Task</button>
+  <div class="container">
+    <header>
+      <h1>Task Manager</h1>
+      <div class="count" id="taskCount">0 tasks</div>
+    </header>
+    <div class="panel">
+      <div class="inputs">
+        <input type="text" id="taskId" placeholder="Task ID"/>
+        <input type="text" id="taskName" placeholder="Task Name"/>
+        <button onclick="addTask()">Add Task</button>
+      </div>
+      <div class="subtitle">Tasks</div>
+      <div id="taskList" class="grid"></div>
+      <div id="emptyState" class="empty" style="display:none">No tasks yet. Add one to get started.</div>
+    </div>
+  </div>
 
-    <h2>Tasks:</h2>
-    <ul id="taskList"></ul>
+  <div id="toast" class="toast">Task added</div>
 
 <script>
-const API_URL = "http://backend-svc:5000/tasks";
+// Use localhost when running outside Kubernetes; fall back to cluster service name
+const API_URL = '/tasks';
 
 async function addTask() {
     const id = document.getElementById("taskId").value.trim();
@@ -47,15 +122,31 @@ async function addTask() {
 
 async function loadTasks() {
     try {
-        const res = await fetch(API_URL + "?_=" + Date.now()); // Cache-busting
-        const tasks = await res.json();
+        const res = await fetch(API_URL + "?_=" + Date.now());
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        let tasks = await res.json();
+        if (!Array.isArray(tasks)) tasks = [];
+
+        // sort by name then id
+        tasks.sort((a,b) => (a.name||'').localeCompare(b.name||'') || (String(a.id||'')).localeCompare(String(b.id||'')));
+
         const list = document.getElementById("taskList");
+        const empty = document.getElementById("emptyState");
+        const count = document.getElementById("taskCount");
         list.innerHTML = "";
 
+        count.textContent = `${tasks.length} ${tasks.length === 1 ? 'task' : 'tasks'}`;
+        empty.style.display = tasks.length ? 'none' : 'block';
+
         tasks.forEach(task => {
-            const li = document.createElement("li");
-            li.textContent = `${task.id}: ${task.name}`;
-            list.appendChild(li);
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <div class="badge">Task</div>
+              <div class="id">ID: ${escapeHtml(task.id ?? '')}</div>
+              <div class="name">${escapeHtml(task.name ?? '')}</div>
+            `;
+            list.appendChild(card);
         });
     } catch (err) {
         console.error("Failed to fetch tasks:", err);
@@ -67,7 +158,17 @@ loadTasks();
 
 // Auto-refresh every 5 seconds
 setInterval(loadTasks, 5000);
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
+}
 </script>
 </body>
 </html>
-
