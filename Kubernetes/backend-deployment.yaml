@@ -26,7 +26,7 @@ spec:
       serviceAccountName: backend-sa
       containers:
         - name: backend
-          image: ahmedsabeh/backend-app:latest
+          image: ahmedsabeh/backend-app:1.1
           env:
             - name: DYNAMO_TABLE
               value: "sabeh-app-db" 

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ahmedsabeh/frontend-app:latest
+          image: ahmedsabeh/frontend-app:1.1
           ports:
             - containerPort: 80
           resources:
