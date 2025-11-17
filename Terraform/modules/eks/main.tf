@@ -124,12 +124,6 @@ resource "aws_security_group" "eks_nodes_sg" {
   }
 }
 
-
-
-
-
-
-
 data "aws_iam_policy_document" "backend_dynamodb_policy" {
   statement {
     effect = "Allow"
@@ -152,13 +146,10 @@ resource "aws_iam_policy" "backend_dynamodb" {
   policy = data.aws_iam_policy_document.backend_dynamodb_policy.json
 }
 
-
-
 # Get the EKS cluster info
 data "aws_eks_cluster" "eks" {
   name = aws_eks_cluster.eks.name
 }
-
 
 # Create IAM OIDC provider for EKS
 resource "aws_iam_openid_connect_provider" "eks_oidc" {
