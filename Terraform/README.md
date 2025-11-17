@@ -1,8 +1,8 @@
-# 🚀 GitOps Microservices Project on AWS
+# 🚀 Infrastructure as Code (Terraform)
 
-## 🧩 Project Overview
+## 🧩 Overview
 
-This project demonstrates a **full GitOps-ready microservices deployment** on AWS, leveraging:
+This repo demonstrates a **full GitOps-ready microservices deployment** on AWS, leveraging:
 
 - **Infrastructure as Code (IaC)** using **Terraform** with modular structure  
 - **Kubernetes (EKS)** for container orchestration  
@@ -106,12 +106,18 @@ kubectl get pods -A
 ```
 <img width="1212" height="362" alt="Screenshot (454)" src="https://github.com/user-attachments/assets/b8dc7ca6-684e-492c-bd6b-84e339feb122" />
 
-## 🔐 Security & Best Practices
+- EKS Cluster
+<img width="1366" height="520" alt="Screenshot (432)" src="https://github.com/user-attachments/assets/b0e8e049-4ab8-4af1-bd82-76b19d2e1b35" />
+<img width="1366" height="522" alt="Screenshot (433)" src="https://github.com/user-attachments/assets/a9ba62e6-dcc9-454b-a46d-3b23e0707758" />
 
-- All AWS resources are tagged for cost tracking and organization.
+- EKS Nodes & Node Groups
+<img width="1366" height="559" alt="Screenshot (435)" src="https://github.com/user-attachments/assets/8a70bf99-edbd-45f6-85f5-698d1a05967d" />
 
-- VPC endpoints ensure private service access.
+- NAT Gateways
+<img width="1366" height="515" alt="Screenshot (436)" src="https://github.com/user-attachments/assets/43bc7fc3-b84a-4351-ae25-948417e9c7e0" />
 
-- Node groups are segregated by workload type (frontend/backend).
+- VPC Endpoints
+<img width="1366" height="551" alt="Screenshot (437)" src="https://github.com/user-attachments/assets/7f956566-218d-4135-8973-1761099e8aa2" />
 
-- CloudWatch collects logs for observability.
+- DynamoDB Table
+<img width="1366" height="551" alt="Screenshot (438)" src="https://github.com/user-attachments/assets/5bf749bd-4895-4e58-b83f-8d40a1f71eba" />
